@@ -1,11 +1,22 @@
 var Twitter = require('twitter');
-var keysRef = require('./keys.js');
 var request = require('request');
 var spotify = require('spotify');
+var fs = require("fs");
+/*var logWrite = "";
+function postLog() {
+	fs.appendFile('log.txt', logWrite, function (err) {
+		  if (err) throw err;
+		  console.log('Saved!');
+		});
+};*/
 
 /*Query Movie Database*/
 
 if (process.argv[2] === "movie-this") {
+	runMovies();
+}
+
+function runMovies() {
 	if (process.argv[3]) {
 
 		var movieName = "";
@@ -20,23 +31,38 @@ if (process.argv[2] === "movie-this") {
 		var queryUrl = 'http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&r=json';
 
 		request(queryUrl, function (er, res, body) {
-			console.log("Title: " + JSON.parse(body).Title + "\nYear: " + JSON.parse(body).Year + "\nIMDB Rating: " + JSON.parse(body).Ratings[0].Value + "\nCountry: " + JSON.parse(body).Country +"\nLanguage: " + JSON.parse(body).Language + "\nPlot: " + JSON.parse(body).Plot + "\nActors: " + JSON.parse(body).Actors + "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].value + "\nRotten Tomatoes URL: https://www.rottentomatoes.com/search/?search=" + movieName);
+			var logWrite = "Title: " + JSON.parse(body).Title + "\nYear: " + JSON.parse(body).Year + "\nIMDB Rating: " + JSON.parse(body).Ratings[0].Value + "\nCountry: " + JSON.parse(body).Country +"\nLanguage: " + JSON.parse(body).Language + "\nPlot: " + JSON.parse(body).Plot + "\nActors: " + JSON.parse(body).Actors + "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].value + "\nRotten Tomatoes URL: https://www.rottentomatoes.com/search/?search=" + movieName + "\n-------\n";
+			
+			console.log(logWrite);
+			fs.appendFile('log.txt', logWrite, function (err) {
+			  if (err) throw err;
+			  console.log('Saved!');
+			});
 		});
 	} 
+
 /*if no movie is chosen then display Mr Nobody*/
 	else {
 
 		var queryUrl = 'http://www.omdbapi.com/?t=mr+nobody&y=&plot=short&r=json';
 
 		request(queryUrl, function (er, res, body) {
-			console.log("Title: " + JSON.parse(body).Title + "\nYear: " + JSON.parse(body).Year + "\nIMDB Rating: " + JSON.parse(body).Ratings[0].Value + "\nCountry: " + JSON.parse(body).Country +"\nLanguage: " + JSON.parse(body).Language + "\nPlot: " + JSON.parse(body).Plot + "\nActors: " + JSON.parse(body).Actors + "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].value + "\nRotten Tomatoes URL: https://www.rottentomatoes.com/search/?search=" + movieName);
-
+			var logWrite = "Title: " + JSON.parse(body).Title + "\nYear: " + JSON.parse(body).Year + "\nIMDB Rating: " + JSON.parse(body).Ratings[0].Value + "\nCountry: " + JSON.parse(body).Country +"\nLanguage: " + JSON.parse(body).Language + "\nPlot: " + JSON.parse(body).Plot + "\nActors: " + JSON.parse(body).Actors + "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].value + "\nRotten Tomatoes URL: https://www.rottentomatoes.com/search/?search=" + movieName + "\n-------\n";
+			console.log(logWrite);
+			fs.appendFile('log.txt', logWrite, function (err) {
+			  if (err) throw err;
+			  console.log('Saved!');
+			});
 		});
 	};
 	};
 
 /*Spotify call to bring back song information*/
 if (process.argv[2] === "spotify-this-song") {
+	runSpotify();
+}
+
+function runSpotify() {
 	if (process.argv[3]) {
 		var songSearch = "";
 
@@ -51,12 +77,15 @@ if (process.argv[2] === "spotify-this-song") {
 			return;
 			};
 
-		console.log("Artist: " + data.tracks.items[0].artists[0].name);
-		console.log("Song Name: " + songSearch);
-		console.log("Preview link: " + data.tracks.items[0].artists[0].external_urls.spotify);
-		console.log("Album: " + data.tracks.items[0].album.name);
+			var logWrite = "Artist: " + data.tracks.items[0].artists[0].name + "\nSong Name: " + songSearch + "\nPreview link: " + data.tracks.items[0].artists[0].external_urls.spotify + "\nAlbum: " + data.tracks.items[0].album.name + "\n-------\n"
+			console.log(logWrite);
+			fs.appendFile('log.txt', logWrite, function (err) {
+			  if (err) throw err;
+			  console.log('Saved!');
+			});
 		});
 	}
+
 /*If no song is chosen default to The Sign by Ace of Base*/
 	else
 	{
@@ -65,17 +94,23 @@ if (process.argv[2] === "spotify-this-song") {
 			console.log('Error occurred: ' + err);
 			return;
 			};
-
-		console.log("Artist: " + data.albums.items[1].artists[0].name);
-		console.log("Song Name: The Sign");
-		console.log("Preview link: " + data.albums.items[1].artists[0].external_urls.spotify);
-		console.log("Album: " + data.albums.items[1].name);
+			var logWrite = "Artist: " + data.albums.items[1].artists[0].name + "\nSong Name: The Sign" + "\nPreview link: " + data.albums.items[1].artists[0].external_urls.spotify + "\nAlbum: " + data.albums.items[1].name + "\n-------\n"
+			console.log(logWrite);
+			fs.appendFile('log.txt', logWrite, function (err) {
+			  if (err) throw err;
+			  console.log('Saved!');
+			});
 		});
 	};
 };
 
 /*Twitter calls*/
 if (process.argv[2] === "my-tweets") {
+	runTweets();
+}
+
+function runTweets() {
+	var keysRef = require('./keys.js');
 
 	const consumer_key = keysRef.twitterKeys.consumer_key;
 	const consumer_secret = keysRef.twitterKeys.consumer_secret;
@@ -100,9 +135,69 @@ if (process.argv[2] === "my-tweets") {
 			console.log('Error occurred: ' + error);
 			return;
 			};
-		for (var i = 0; i < tweets.length; i++) {
-			console.log("Tweet: " + tweets[i].text + "\nLocation: " + tweets[i].user.location +"\n-------\n");
+		for (var i = 0; i < 20; i++) {
+			console.log("Number: " + [i] + "\nTweet: " + tweets[i].text + "\nCreated: " + tweets[i].user.created_at +"\n-------\n");
 		}
+	});
+};
+
+
+/*Do what it says referece the random.txt file*/
+if (process.argv[2] === "do-what-it-says") {
+	runRandom();
+}
+
+function runRandom() {
+	fs.readFile("random.txt", "utf8", function(error, data) {
+
+	    if(error)
+	    {
+	        console.log("I had an error reading your file.");
+	    }
+	    else
+	    {
+
+		 console.log(data);
+
+		 var dataArr = data.split(",");
+
+		 /*console.log(dataArr);*/
+
+	/*if contents of random.txt is a spotify song run the spotify query*/
+			if (dataArr[0] === 'spotify-this-song') {
+				songSearch = dataArr[1];
+				
+				spotify.search({ type: 'track', query: songSearch}, function(err, data) {
+					if ( err ) {
+					console.log('Error occurred: ' + err);
+					return;
+					};
+				var logWrite = "Artist: " + data.tracks.items[0].artists[0].name + "\nSong Name: " + songSearch + "\nPreview link: " + data.tracks.items[0].artists[0].external_urls.spotify + "\nAlbum: " + data.tracks.items[0].album.name + "\n-------\n"
+				console.log(logWrite);
+				fs.appendFile('log.txt', logWrite, function (err) {
+				  if (err) throw err;
+				  console.log('Saved!');
+				});
+				});
+			};
+
+	/*if contents of random.txt is a spotify song run the movie query*/
+			if (dataArr[0] === 'movie-this') {
+				movieName = dataArr[1];
+				var queryUrl = 'http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&r=json';
+
+				request(queryUrl, function (er, res, body) {
+				var logWrite = "Title: " + JSON.parse(body).Title + "\nYear: " + JSON.parse(body).Year + "\nIMDB Rating: " + JSON.parse(body).Ratings[0].Value + "\nCountry: " + JSON.parse(body).Country +"\nLanguage: " + JSON.parse(body).Language + "\nPlot: " + JSON.parse(body).Plot + "\nActors: " + JSON.parse(body).Actors + "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].value + "\nRotten Tomatoes URL: https://www.rottentomatoes.com/search/?search=" + movieName + "\n-------\n";
+			
+				console.log(logWrite);
+				fs.appendFile('log.txt', logWrite, function (err) {
+				  if (err) throw err;
+				  console.log('Saved!');
+				});
+				});
+
+			}
+		};
 	});
 };
 
