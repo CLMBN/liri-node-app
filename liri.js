@@ -1,6 +1,10 @@
+var Twitter = require('twitter');
+var keysRef = require('./keys.js');
+var request = require('request');
+var spotify = require('spotify');
 
 /*Query Movie Database*/
-var request = require('request');
+
 if (process.argv[2] === "movie-this") {
 	if (process.argv[3]) {
 
@@ -18,9 +22,8 @@ if (process.argv[2] === "movie-this") {
 		request(queryUrl, function (er, res, body) {
 			console.log("Title: " + JSON.parse(body).Title + "\nYear: " + JSON.parse(body).Year + "\nIMDB Rating: " + JSON.parse(body).Ratings[0].Value + "\nCountry: " + JSON.parse(body).Country +"\nLanguage: " + JSON.parse(body).Language + "\nPlot: " + JSON.parse(body).Plot + "\nActors: " + JSON.parse(body).Actors + "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].value + "\nRotten Tomatoes URL: https://www.rottentomatoes.com/search/?search=" + movieName);
 		});
-
-/*if no movie is chosen then display Mr Nobody*/
 	} 
+/*if no movie is chosen then display Mr Nobody*/
 	else {
 
 		var queryUrl = 'http://www.omdbapi.com/?t=mr+nobody&y=&plot=short&r=json';
@@ -34,7 +37,6 @@ if (process.argv[2] === "movie-this") {
 
 /*Spotify call to bring back song information*/
 if (process.argv[2] === "spotify-this-song") {
-	var spotify = require('spotify');
 	if (process.argv[3]) {
 		var songSearch = "";
 
@@ -55,6 +57,7 @@ if (process.argv[2] === "spotify-this-song") {
 		console.log("Album: " + data.tracks.items[0].album.name);
 		});
 	}
+/*If no song is chosen default to The Sign by Ace of Base*/
 	else
 	{
 		spotify.search({ type: 'album', query: 'The Sign'}, function(err, data) {
@@ -73,13 +76,33 @@ if (process.argv[2] === "spotify-this-song") {
 
 /*Twitter calls*/
 if (process.argv[2] === "my-tweets") {
-	var key = require('./keys.js')
 
-	var params = {screen_name: 'nodejs'};
+	const consumer_key = keysRef.twitterKeys.consumer_key;
+	const consumer_secret = keysRef.twitterKeys.consumer_secret;
+	const access_token_key = keysRef.twitterKeys.access_token_key;
+	const access_token_secret = keysRef.twitterKeys.access_token_secret;
+	
+	const TwitterRef = require('Twitter');
+		var client = new TwitterRef({
+		    consumer_key: consumer_key,
+		    consumer_secret: consumer_secret,
+		    access_token_key: access_token_key,
+		    access_token_secret: access_token_secret
+  		});
+		console.log(consumer_key);
+		console.log(consumer_secret);
+		console.log(access_token_key);
+		console.log(access_token_secret);
+
+	var params = {screen_name: 'juanmiossa'};
 	client.get('statuses/user_timeline', params, function(error, tweets, response) {
-	  if (!error) {
-	    console.log(tweets);
-	  }
+  		if ( error ) {
+			console.log('Error occurred: ' + error);
+			return;
+			};
+		for (var i = 0; i < tweets.length; i++) {
+			console.log("Tweet: " + tweets[i].text + "\nLocation: " + tweets[i].user.location +"\n-------\n");
+		}
 	});
-	var request = require('request');
-}
+};
+
